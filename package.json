@@ -1,0 +1,22 @@
+{
+  "name": "create-website-script",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Automates the creation and setup of directories for web development projects with HTML, JS, and CSS.",
+  "main": "index.js",
+  "scripts": {
+    "create-website": "node --experimental-specifier-resolution=node create-website.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gxstavo19/"
+  },
+  "author": "Gxstavo19.dev",
+  "license": "ISC",
+  "dependencies": {
+    "bootstrap": "^5.3.1",
+    "chalk": "^5.3.0",
+    "fs-extra": "^11.1.1",
+    "inquirer": "^6.3.1"
+  }
+}
