@@ -9,9 +9,9 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/gxstavo19/"
+    "url": "https://github.com/gu19dev/"
   },
-  "author": "Gxstavo19.dev",
+  "author": "Gustavo19.dev",
   "license": "ISC",
   "dependencies": {
     "bootstrap": "^5.3.1",
