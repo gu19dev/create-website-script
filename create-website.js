@@ -2,18 +2,35 @@ import fs from "fs-extra";
 import inquirer from "inquirer";
 import figlet from "figlet";
 import chalk from "chalk";
+import path from "path";
+import { fileURLToPath } from 'url';
 
-// Gerar o texto ASCII estilizado
+function rainbowText(text) {
+    const rainbowColors = [
+        'red',
+        'yellow',
+        'green',
+        'blue',
+        'magenta',
+        'cyan'
+    ];
+
+    let rainbowText = '';
+    for (let i = 0; i < text.length; i++) {
+        const color = rainbowColors[i % rainbowColors.length];
+        rainbowText += chalk[color](text[i]);
+    }
+    return rainbowText;
+}
+
 figlet.text("create-website", { font: "Slant" }, (err, data) => {
   if (err) {
     console.error(chalk.red("Erro ao gerar arte ASCII:"), err);
     return;
   }
 
-  // Exibir o texto ASCII estilizado em azul
-  console.log(chalk.blue(data));
+  console.log(rainbowText(data));
 
-  // Perguntar pelo nome do projeto
   inquirer
     .prompt([
       {
@@ -25,48 +42,41 @@ figlet.text("create-website", { font: "Slant" }, (err, data) => {
     .then((answers) => {
       const { projectName } = answers;
 
-      // Criar a estrutura de pastas
-      fs.mkdirSync(projectName);
-      fs.mkdirSync(`${projectName}/css`);
-      fs.mkdirSync(`${projectName}/js`);
+      const boilerplatePath = path.join(path.dirname(fileURLToPath(import.meta.url)), "boilerplate.html");
 
-      fs.writeFileSync(
-        `${projectName}/index.html`,
-        `
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title></title>
-    <link rel="stylesheet" href="css/styles.css">
-    <script src="js/script.js"></script>
-</head>
-<body>
-  <h1>Meu Site</h1>
-</body>
-</html>
-`
-      );
+      try {
+        const boilerplateContent = fs.readFileSync(boilerplatePath, "utf-8");
 
-      fs.writeFileSync(
-        `${projectName}/css/styles.css`,
-        `
-/* Seus estilos CSS aqui */
-`
-      );
+        const finalContent = boilerplateContent.replace(/\$\{projectName\}/g, projectName);
 
-      fs.writeFileSync(
-        `${projectName}/js/script.js`,
-        `
-// Seu código JavaScript aqui
-`
-      );
+        const desktopPath = path.join(process.env.USERPROFILE, 'Desktop');
+        const projectPath = path.join(desktopPath, projectName);
 
-      fs.mkdirSync(`${projectName}/images`);
+        const rootDirName = path.basename(projectPath);
 
-      console.log(chalk.green("Projeto criado com sucesso!"));
+        fs.mkdirSync(projectPath);
+        fs.mkdirSync(path.join(projectPath, "css"));
+        fs.mkdirSync(path.join(projectPath, "js"));
+        fs.mkdirSync(path.join(projectPath, "images"));
+
+        const titleContent = `<title>${rootDirName}</title>`;
+        const finalHtmlContent = finalContent.replace(/<title>[\s\S]*<\/title>/, titleContent);
+        fs.writeFileSync(path.join(projectPath, "index.html"), finalHtmlContent);
+
+        fs.writeFileSync(path.join(projectPath, "js", "script.js"), '');
+        const cssContent = `
+.myDiv {
+	text-align: center;
+	padding-top: 100vh;
+}
+        `;
+                fs.writeFileSync(path.join(projectPath, "css", "styles.css"), cssContent);
+        
+
+        console.log(chalk.green("Projeto criado com sucesso na área de trabalho:", projectPath));
+      } catch (error) {
+        console.error(chalk.red("Ocorreu um erro:"), error);
+      }
     })
     .catch((error) => {
       console.error(chalk.red("Ocorreu um erro:"), error);
